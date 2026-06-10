@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integrations — AI Automation Command Center</title>
+<link rel="icon" href="/static/logo.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  ink: '#0b1020', panel: '#121a30', edge: '#1f2b4d', accent: '#6ee7ff'
+}}}};
+</script>
+<style>
+  body { background: radial-gradient(1200px 600px at 80% -10%, #16224a 0%, #0b1020 55%); }
+  pre { tab-size: 2; }
+</style>
+</head>
+<body class="text-slate-200 font-sans min-h-screen">
+
+<header class="border-b border-edge/60 bg-panel/60 backdrop-blur sticky top-0 z-20">
+  <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-3">
+      <img src="/static/logo.svg" alt="" class="w-9 h-9">
+      <div>
+        <h1 class="font-semibold leading-tight">AI Automation Command Center</h1>
+        <p class="text-xs text-slate-400">Integrations &amp; webhook reference</p>
+      </div>
+    </a>
+    <nav class="text-sm flex gap-4">
+      <a href="/" class="text-slate-400 hover:text-accent">Dashboard</a>
+      <a href="/contact" class="text-slate-400 hover:text-accent">Contact demo</a>
+      <a href="/docs" class="text-slate-400 hover:text-accent">API docs</a>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-8 space-y-8">
+
+  <section>
+    <h2 class="text-2xl font-bold">Connect any channel in minutes</h2>
+    <p class="text-slate-400 mt-2">The Command Center is the intelligence layer: triage, scoring,
+    drafting, compliance, and human approval. Channels plug into it through plain HTTP —
+    anything that can send a webhook can feed the pipeline, and approved replies flow back out
+    automatically on the channel they arrived on.</p>
+  </section>
+
+  <!-- Live channels -->
+  <section class="grid md:grid-cols-3 gap-4" id="channel-cards">
+    <div class="bg-panel/80 border border-edge rounded-xl p-4">
+      <div class="text-2xl">✈️</div>
+      <h3 class="font-semibold mt-1">Telegram <span id="tg-status" class="text-xs font-normal text-slate-500">checking…</span></h3>
+      <p class="text-xs text-slate-400 mt-1">Two-way. Visitors message the bot; approved replies are sent back in chat.</p>
+      <p id="tg-link" class="text-xs mt-2"></p>
+    </div>
+    <div class="bg-panel/80 border border-edge rounded-xl p-4">
+      <div class="text-2xl">📧</div>
+      <h3 class="font-semibold mt-1">Email out <span id="em-status" class="text-xs font-normal text-slate-500">checking…</span></h3>
+      <p class="text-xs text-slate-400 mt-1">Approved replies are emailed to the sender via Resend.</p>
+    </div>
+    <div class="bg-panel/80 border border-edge rounded-xl p-4">
+      <div class="text-2xl">💬</div>
+      <h3 class="font-semibold mt-1">Slack alerts <span id="sl-status" class="text-xs font-normal text-slate-500">checking…</span></h3>
+      <p class="text-xs text-slate-400 mt-1">Hot leads and high-risk items ping the team instantly.</p>
+    </div>
+  </section>
+
+  <!-- Webhook contract -->
+  <section class="bg-panel/80 border border-edge rounded-xl p-5 space-y-4">
+    <h3 class="text-lg font-semibold">Webhook contract — n8n · Zapier · Make · anything</h3>
+    <p class="text-sm text-slate-400">Point any HTTP node at these endpoints. Responses are
+    <code class="text-accent">202 Accepted</code> with an <code class="text-accent">item_id</code>;
+    processing is asynchronous.</p>
+
+    <div>
+      <p class="text-sm font-medium mb-1.5">Submit a lead</p>
+<pre class="bg-ink/70 border border-edge rounded-lg p-3 text-xs overflow-x-auto text-slate-300">curl -X POST https://YOUR-APP.onrender.com/api/leads \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_INTAKE_KEY" \
+  -d '{
+    "name": "Jane Doe",
+    "email": "jane@acme.com",
+    "company": "Acme Inc",
+    "message": "We need invoice automation, budget approved, urgent."
+  }'</pre>
+    </div>
+
+    <div>
+      <p class="text-sm font-medium mb-1.5">Submit an inbound email</p>
+<pre class="bg-ink/70 border border-edge rounded-lg p-3 text-xs overflow-x-auto text-slate-300">curl -X POST https://YOUR-APP.onrender.com/api/emails \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_INTAKE_KEY" \
+  -d '{
+    "name": "Tom Becker",
+    "email": "tom@beckerco.com",
+    "subject": "Integration question",
+    "body": "Does your platform integrate with HubSpot?"
+  }'</pre>
+    </div>
+
+    <div class="text-sm text-slate-400 space-y-1">
+      <p><strong class="text-slate-300">Authentication:</strong> if <code class="text-accent">INTAKE_API_KEY</code>
+      is set on the server, machine callers must send <code class="text-accent">X-API-Key</code>.
+      The built-in dashboard and contact page remain open (same-origin).</p>
+      <p><strong class="text-slate-300">Poll results:</strong> <code class="text-accent">GET /api/items/{item_id}</code>
+      returns status, score, priority, draft, risk, and the full agent trace.</p>
+    </div>
+  </section>
+
+  <!-- n8n recipe -->
+  <section class="bg-panel/80 border border-edge rounded-xl p-5">
+    <h3 class="text-lg font-semibold mb-3">Typical n8n recipe</h3>
+    <ol class="text-sm text-slate-400 space-y-2 list-decimal ml-5">
+      <li><strong class="text-slate-300">Trigger node</strong> — Gmail / LinkedIn / Typeform / Twilio / CRM watch</li>
+      <li><strong class="text-slate-300">Set node</strong> — map fields to the contract above (name, email, message)</li>
+      <li><strong class="text-slate-300">HTTP Request node</strong> — POST to <code class="text-accent">/api/leads</code> with the X-API-Key header</li>
+      <li><strong class="text-slate-300">Wait + HTTP node (optional)</strong> — poll <code class="text-accent">/api/items/{id}</code> and branch on <code class="text-accent">status</code>: route <em>approved</em> drafts to your sender of choice (Outlook, LinkedIn DM, WhatsApp…)</li>
+    </ol>
+    <p class="text-xs text-slate-500 mt-3">The Command Center owns judgment and governance; n8n owns connectors and delivery. Use each for what it's best at.</p>
+  </section>
+
+  <!-- Setup guides -->
+  <section class="bg-panel/80 border border-edge rounded-xl p-5 space-y-5">
+    <h3 class="text-lg font-semibold">Enable channels (each is one env var)</h3>
+    <div class="grid md:grid-cols-3 gap-5 text-sm">
+      <div>
+        <h4 class="font-medium text-accent">✈️ Telegram (2 min)</h4>
+        <ol class="text-xs text-slate-400 mt-2 space-y-1.5 list-decimal ml-4">
+          <li>Message <strong>@BotFather</strong>, send <code>/newbot</code></li>
+          <li>Copy the token into <code>TELEGRAM_BOT_TOKEN</code></li>
+          <li>Deployed? Set <code>BASE_URL</code> (webhook mode). Localhost? Leave empty (polling mode)</li>
+        </ol>
+      </div>
+      <div>
+        <h4 class="font-medium text-accent">📧 Resend (5 min)</h4>
+        <ol class="text-xs text-slate-400 mt-2 space-y-1.5 list-decimal ml-4">
+          <li>Free account at <strong>resend.com</strong> → API key into <code>RESEND_API_KEY</code></li>
+          <li>Sandbox sender works for your own inbox; verify a domain (free) to email anyone, then set <code>EMAIL_FROM</code></li>
+        </ol>
+      </div>
+      <div>
+        <h4 class="font-medium text-accent">💬 Slack (2 min)</h4>
+        <ol class="text-xs text-slate-400 mt-2 space-y-1.5 list-decimal ml-4">
+          <li>Create an <strong>Incoming Webhook</strong> in your Slack workspace</li>
+          <li>Paste the URL into <code>SLACK_WEBHOOK_URL</code></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-center text-xs text-slate-600 pb-6">
+    Built by <a href="https://github.com/chinmay6497" class="text-accent/80 hover:underline">Chinmay Raval</a> — AI Automation Architect
+  </footer>
+</main>
+
+<script>
+(async () => {
+  const c = await (await fetch('/api/config')).json();
+  const set = (id, on) => {
+    const el = document.getElementById(id);
+    el.textContent = on ? '● live' : '○ not configured';
+    el.className = 'text-xs font-normal ' + (on ? 'text-emerald-400' : 'text-slate-500');
+  };
+  set('tg-status', c.telegram.enabled);
+  set('em-status', c.email_out);
+  set('sl-status', c.slack_alerts);
+  if (c.telegram.enabled && c.telegram.bot_username)
+    document.getElementById('tg-link').innerHTML =
+      `<a class="text-accent hover:underline" target="_blank" href="https://t.me/${c.telegram.bot_username}">Try it: @${c.telegram.bot_username} →</a>`;
+})();
+</script>
+</body>
+</html>

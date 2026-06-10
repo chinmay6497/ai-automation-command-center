@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Sales — Apex Solutions (Demo)</title>
+<link rel="icon" href="/static/logo.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  ink: '#0b1020', panel: '#121a30', edge: '#1f2b4d', accent: '#6ee7ff'
+}}}};
+</script>
+<style>
+  body { background: radial-gradient(1200px 600px at 80% -10%, #16224a 0%, #0b1020 55%); }
+</style>
+</head>
+<body class="min-h-screen font-sans text-slate-200 flex flex-col">
+
+<div class="bg-accent/10 border-b border-accent/30 text-accent text-center text-xs py-1.5 px-3">
+  🧪 Demo page — this simulates a client's website contact form. Submissions flow into the
+  <a href="/" class="underline font-semibold">AI Command Center dashboard</a>, where you can watch agents process them live.
+</div>
+
+<header class="max-w-5xl mx-auto w-full px-6 py-5 flex items-center justify-between">
+  <div class="flex items-center gap-2.5">
+    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-blue-500 text-ink flex items-center justify-center font-bold">A</div>
+    <span class="font-semibold text-lg tracking-tight">Apex Solutions</span>
+  </div>
+  <a href="/" class="text-sm text-accent hover:underline">← Back to dashboard</a>
+</header>
+
+<main class="flex-1 max-w-5xl mx-auto w-full px-6 py-8 grid md:grid-cols-2 gap-10 items-start">
+  <div class="space-y-5 pt-4">
+    <h1 class="text-4xl font-bold tracking-tight text-white">Talk to our team</h1>
+    <p class="text-slate-400 text-lg">Tell us what you're trying to automate. Our AI-assisted
+      sales desk reads every message, prioritizes it instantly, and gets you a personal answer —
+      usually within a minute.</p>
+    <ul class="space-y-3 text-slate-300">
+      <li class="flex gap-3"><span class="text-accent">⚡</span> Replies drafted in seconds by AI agents</li>
+      <li class="flex gap-3"><span class="text-accent">👤</span> Every important reply reviewed by a human before it's sent</li>
+      <li class="flex gap-3"><span class="text-accent">🔒</span> Compliance-checked — no risky or off-policy answers</li>
+    </ul>
+    <div class="bg-panel/80 border border-edge rounded-xl p-4 text-sm text-slate-400">
+      💡 <strong class="text-slate-300">Trying the demo?</strong> Mention a budget, an urgent deadline, or ask to cancel —
+      then watch how differently the agents score and route each one on the
+      <a href="/" class="text-accent underline">dashboard</a>.
+    </div>
+  </div>
+
+  <div class="bg-panel/90 rounded-2xl border border-edge p-6 shadow-2xl shadow-black/40">
+    <form id="form" class="space-y-4">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-sm font-medium text-slate-300">Name</label>
+          <input name="name" required class="mt-1 w-full bg-ink/70 border border-edge rounded-lg px-3 py-2.5 outline-none focus:border-accent/60 placeholder-slate-600" placeholder="Jane Doe">
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-300">Company</label>
+          <input name="company" class="mt-1 w-full bg-ink/70 border border-edge rounded-lg px-3 py-2.5 outline-none focus:border-accent/60 placeholder-slate-600" placeholder="Acme Inc">
+        </div>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-slate-300">Work email</label>
+        <input name="email" type="email" required class="mt-1 w-full bg-ink/70 border border-edge rounded-lg px-3 py-2.5 outline-none focus:border-accent/60 placeholder-slate-600" placeholder="jane@acme.com">
+        <p class="text-xs text-slate-500 mt-1">If outbound email is configured, the approved reply lands in this inbox.</p>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-slate-300">How can we help?</label>
+        <textarea name="message" rows="5" required minlength="3" class="mt-1 w-full bg-ink/70 border border-edge rounded-lg px-3 py-2.5 outline-none focus:border-accent/60 placeholder-slate-600" placeholder="We're looking to automate our invoice processing — budget approved, hoping to start this quarter…"></textarea>
+      </div>
+      <button class="w-full bg-gradient-to-r from-accent to-blue-500 text-ink font-semibold py-3 rounded-lg hover:opacity-90 transition">Send message</button>
+    </form>
+
+    <div id="success" class="hidden text-center py-10 space-y-3">
+      <div class="text-5xl">✅</div>
+      <h3 class="text-xl font-semibold text-white">Message received!</h3>
+      <p class="text-slate-400 text-sm">Our AI agents are processing it right now.</p>
+      <a id="watch-link" href="/" class="inline-block mt-2 bg-gradient-to-r from-accent to-blue-500 text-ink text-sm font-semibold px-4 py-2.5 rounded-lg hover:opacity-90">Watch the agents handle it live →</a>
+      <button onclick="resetForm()" class="block mx-auto text-sm text-slate-500 hover:text-slate-300 underline">Send another</button>
+    </div>
+  </div>
+</main>
+
+<footer class="text-center text-xs text-slate-600 py-5">
+  Part of the <a href="/" class="underline hover:text-accent">AI Automation Command Center</a> demo ·
+  built by <a href="https://github.com/chinmay6497" class="underline hover:text-accent">Chinmay Raval</a>
+</footer>
+
+<script>
+const form = document.getElementById('form');
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const r = await fetch('/api/leads', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: f.name.value, email: f.email.value,
+                           company: f.company.value, message: f.message.value }) });
+  if (r.ok) { form.classList.add('hidden'); document.getElementById('success').classList.remove('hidden'); }
+  else alert('Please fill in the message field (min 3 characters).');
+};
+function resetForm() {
+  form.reset(); form.classList.remove('hidden');
+  document.getElementById('success').classList.add('hidden');
+}
+</script>
+</body>
+</html>
