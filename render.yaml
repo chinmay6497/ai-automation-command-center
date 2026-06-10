@@ -8,6 +8,14 @@ services:
     envVars:
       - key: GROQ_API_KEY
         sync: false          # set in Render dashboard — never commit keys
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false          # optional: two-way Telegram channel
+      - key: SLACK_WEBHOOK_URL
+        sync: false          # optional: hot-lead alerts
+      - key: RESEND_API_KEY
+        sync: false          # optional: outbound email on approval
+      - key: BASE_URL
+        sync: false          # set to the public URL after first deploy (enables Telegram webhook mode)
       - key: GROQ_MODEL
         value: llama-3.3-70b-versatile
       - key: PYTHON_VERSION
